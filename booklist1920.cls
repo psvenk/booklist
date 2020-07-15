@@ -157,107 +157,118 @@
 	}
 }
 
+\cs_new:Nn \__booklist_format_daterange:N {
+	% #1: token list variable to interpret as a date range
+
+	\seq_set_split:NnV \l_booklist_daterange_seq {-} #1
+	\bool_set_false:N \l_booklist_datea_approx_bool
+
+	\__booklist_populate_datea:N \l_booklist_datea_year_int
+	\__booklist_populate_datea:N \l_booklist_datea_month_int
+	\__booklist_populate_datea:N \l_booklist_datea_day_int
+
+	\__booklist_populate_dateb:NN
+		\l_booklist_dateb_day_int \l_booklist_datea_day_int
+	\__booklist_populate_dateb:NN
+		\l_booklist_dateb_month_int \l_booklist_datea_month_int
+	\__booklist_populate_dateb:NN
+		\l_booklist_dateb_year_int \l_booklist_datea_year_int
+
+	\int_compare:nNnTF
+	{\l_booklist_datea_year_int} = {\l_booklist_dateb_year_int}
+	{
+		\bool_if:NT \l_booklist_datea_approx_bool {\textasciitilde{}}
+		\DTMenglishordinal{\int_use:N \l_booklist_datea_day_int}
+		\DTMenGBdaymonthsep
+		\DTMenglishshortmonthname{
+			\int_use:N \l_booklist_datea_month_int
+		}
+		, ~
+		\bool_if:NTF \l_booklist_dateb_unknown_bool
+		{
+			\prop_get:NnNT \g_booklist_config_prop {unknowncolor}
+			\l_tmpa_tl {
+				\color{\tl_use:N \l_tmpa_tl}
+			}
+			{???}
+		}
+		{
+			\bool_if:NT \l_booklist_dateb_approx_bool {
+				\textasciitilde{}
+			}
+			\DTMenglishordinal{\int_use:N \l_booklist_dateb_day_int}
+			\DTMenGBdaymonthsep
+			\DTMenglishshortmonthname{
+				\int_use:N \l_booklist_dateb_month_int
+			}
+
+			\int_compare:nNnF
+			{\l_booklist_dateb_year_int}
+			= {\g_booklist_currentyear_int}
+			{
+				\DTMenGBmonthyearsep
+				\int_use:N \l_booklist_dateb_year_int
+
+				\int_compare:nNnT
+				{\l_booklist_dateb_year_int}
+				> {\g_booklist_currentyear_int}
+				{
+					\int_gset_eq:NN
+					\g_booklist_currentyear_int
+					\l_booklist_dateb_year_int
+				}
+			}
+		}
+	}
+	{
+		\bool_if:NT \l_booklist_datea_approx_bool {\textasciitilde{}}
+		\DTMDisplaydate
+		{\int_use:N \l_booklist_datea_year_int}
+		{\int_use:N \l_booklist_datea_month_int}
+		{\int_use:N \l_booklist_datea_day_int}
+		{-1}
+		, ~
+		\bool_if:NTF \l_booklist_dateb_unknown_bool
+		{
+			\prop_get:NnNT \g_booklist_config_prop {unknowncolor}
+			\l_tmpa_tl {
+				\color{\tl_use:N \l_tmpa_tl}
+			}
+			{???}
+		}
+		{
+			\bool_if:NT \l_booklist_dateb_approx_bool {
+				\textasciitilde{}
+			}
+			\DTMDisplaydate
+			{\int_use:N \l_booklist_dateb_year_int}
+			{\int_use:N \l_booklist_dateb_month_int}
+			{\int_use:N \l_booklist_dateb_day_int}
+			{-1}
+
+			\int_compare:nNnT
+			{\l_booklist_dateb_year_int}
+			> {\g_booklist_currentyear_int}
+			{
+				\int_gset_eq:NN
+					\g_booklist_currentyear_int
+					\l_booklist_dateb_year_int
+			}
+		}
+	}
+}
+
+\seq_new:N \l_booklist_dateranges_seq
 \cs_new:Nn \booklist_format_date:N {
 	% #1: prop with book information
 	\prop_if_in:NnTF #1 {date}
 		{
 			\prop_get:NnN #1 {date} \l_tmpa_tl
-
-			\seq_set_split:NnV \l_booklist_daterange_seq {-} \l_tmpa_tl
-			\bool_set_false:N \l_booklist_datea_approx_bool
-
-			\__booklist_populate_datea:N \l_booklist_datea_year_int
-			\__booklist_populate_datea:N \l_booklist_datea_month_int
-			\__booklist_populate_datea:N \l_booklist_datea_day_int
-
-			\__booklist_populate_dateb:NN
-				\l_booklist_dateb_day_int \l_booklist_datea_day_int
-			\__booklist_populate_dateb:NN
-				\l_booklist_dateb_month_int \l_booklist_datea_month_int
-			\__booklist_populate_dateb:NN
-				\l_booklist_dateb_year_int \l_booklist_datea_year_int
-
-			\int_compare:nNnTF
-			{\l_booklist_datea_year_int} = {\l_booklist_dateb_year_int}
-			{
-				\bool_if:NT \l_booklist_datea_approx_bool {\textasciitilde{}}
-				\DTMenglishordinal{\int_use:N \l_booklist_datea_day_int}
-				\DTMenGBdaymonthsep
-				\DTMenglishshortmonthname{
-					\int_use:N \l_booklist_datea_month_int
-				}
-				, ~
-				\bool_if:NTF \l_booklist_dateb_unknown_bool
-				{
-					\prop_get:NnNT \g_booklist_config_prop {unknowncolor}
-					\l_tmpa_tl {
-						\color{\tl_use:N \l_tmpa_tl}
-					}
-					{???}
-				}
-				{
-					\bool_if:NT \l_booklist_dateb_approx_bool {
-						\textasciitilde{}
-					}
-					\DTMenglishordinal{\int_use:N \l_booklist_dateb_day_int}
-					\DTMenGBdaymonthsep
-					\DTMenglishshortmonthname{
-						\int_use:N \l_booklist_dateb_month_int
-					}
-
-					\int_compare:nNnF
-					{\l_booklist_dateb_year_int}
-					= {\g_booklist_currentyear_int}
-					{
-						\DTMenGBmonthyearsep
-						\int_use:N \l_booklist_dateb_year_int
-
-						\int_compare:nNnT
-						{\l_booklist_dateb_year_int}
-						> {\g_booklist_currentyear_int}
-						{
-							\int_gset_eq:NN
-							\g_booklist_currentyear_int
-							\l_booklist_dateb_year_int
-						}
-					}
-				}
-			}
-			{
-				\bool_if:NT \l_booklist_datea_approx_bool {\textasciitilde{}}
-				\DTMDisplaydate
-				{\int_use:N \l_booklist_datea_year_int}
-				{\int_use:N \l_booklist_datea_month_int}
-				{\int_use:N \l_booklist_datea_day_int}
-				{-1}
-				, ~
-				\bool_if:NTF \l_booklist_dateb_unknown_bool
-				{
-					\prop_get:NnNT \g_booklist_config_prop {unknowncolor}
-					\l_tmpa_tl {
-						\color{\tl_use:N \l_tmpa_tl}
-					}
-					{???}
-				}
-				{
-					\bool_if:NT \l_booklist_dateb_approx_bool {
-						\textasciitilde{}
-					}
-					\DTMDisplaydate
-					{\int_use:N \l_booklist_dateb_year_int}
-					{\int_use:N \l_booklist_dateb_month_int}
-					{\int_use:N \l_booklist_dateb_day_int}
-					{-1}
-
-					\int_compare:nNnT
-					{\l_booklist_dateb_year_int}
-					> {\g_booklist_currentyear_int}
-					{
-						\int_gset_eq:NN
-							\g_booklist_currentyear_int
-							\l_booklist_dateb_year_int
-					}
-				}
+			\seq_set_split:NnV \l_booklist_dateranges_seq {;} \l_tmpa_tl
+			\bool_until_do:nn {\seq_if_empty_p:N \l_booklist_dateranges_seq} {
+				\seq_pop_left:NNT \l_booklist_dateranges_seq \l_tmpa_tl
+					{\__booklist_format_daterange:N \l_tmpa_tl}
+				\seq_if_empty:NF \l_booklist_dateranges_seq {;~}
 			}
 		}
 		{\multicolumn{1}{c}{(No~Date)}}
