@@ -1,0 +1,35 @@
+*.*
+!.gitignore
+!.editorconfig
+!*.cls
+!*.md
+
+# Standard LaTeX gitignore:
+
+# # Intermediate files
+# *.aux
+# *.lof
+# *.log
+# *.lot
+# *.fls
+# *.out
+# *.toc
+# *.fmt
+# *.fot
+# *.cb
+# *.cb2
+# .*.lb
+
+# # Output files
+# *.dvi
+# *.ps
+# *.pdf
+
+# # Build system files
+# *.fdb_latexmk
+# *.synctex
+# *.synctex(busy)
+# *.synctex.gz
+# *.synctex.gz(busy)
+# *.pdfsync
+# latex.out/
