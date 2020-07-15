@@ -25,6 +25,8 @@
 \cellspacetoplimit 2.5pt
 
 \prop_new:N \g_booklist_config_prop
+\prop_new:N \g_booklist_attribute_names_prop
+\prop_new:N \g_booklist_attribute_colors_prop
 
 \bool_new:N \g_booklist_isfirstrow_bool
 \bool_set_true:N \g_booklist_isfirstrow_bool
@@ -44,6 +46,14 @@
 
 \NewDocumentCommand \booklistconfig {m} {
 	\keys_set:nn {booklist_config} {#1}
+}
+
+\NewDocumentCommand \booklistattributenames {m} {
+	\prop_gset_from_keyval:Nn \g_booklist_attribute_names_prop {#1}
+}
+
+\NewDocumentCommand \booklistattributecolors {m} {
+	\prop_gset_from_keyval:Nn \g_booklist_attribute_colors_prop {#1}
 }
 
 \NewDocumentEnvironment {booklist} {O{6.75cm}O{3.25cm}O{2.5cm}} {
@@ -67,8 +77,34 @@
 	\end{longtable}
 }
 
+\seq_new:N \l_booklist_attributes_seq
 \cs_new:Nn \booklist_format_title:N {
 	% #1: prop with book information
+	\prop_get:NnNT #1 {attributes} \l_tmpa_tl {
+		(
+		\seq_set_split:NnV \l_booklist_attributes_seq {,} \l_tmpa_tl
+		\bool_until_do:nn {\seq_if_empty_p:N \l_booklist_attributes_seq} {
+			\seq_pop_left:NNT \l_booklist_attributes_seq \l_tmpa_tl
+			{
+				{
+					\prop_map_inline:Nn \g_booklist_attribute_colors_prop {
+						\str_if_eq:NNT \l_tmpa_tl {##1} {
+							\color{##2}
+						}
+					}
+					\tl_use:N \l_tmpa_tl
+				}
+				\prop_map_inline:Nn \g_booklist_attribute_names_prop {
+					\str_if_eq:NNT \l_tmpa_tl {##1} {
+						\footnote{##2}
+						\prop_gremove:Nn \g_booklist_attribute_names_prop {##1}
+					}
+				}
+			}
+			\seq_if_empty:NF \l_booklist_attributes_seq {;~}
+		}
+		) ~
+	}
 	\prop_if_in:NnTF #1 {title}
 		{
 			\prop_get:NnNT #1 {title} \l_tmpa_tl
