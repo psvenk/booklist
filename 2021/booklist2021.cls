@@ -1,7 +1,7 @@
 %% Book list class - 2021 version (2020-2021)
-% Last updated 2020-07-14
+% Last updated 2021-06-07
 
-% Copyright (c) 2020 psvenk
+% Copyright (c) 2020-21 psvenk
 
 % This Source Code Form is subject to the terms of the Mozilla Public
 % License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,7 +11,7 @@
 
 \NeedsTeXFormat{LaTeX2e}
 \RequirePackage{expl3, l3keys2e, xparse}
-\ProvidesExplClass {booklist2021} {2020/07/13} {2021} {Book list class}
+\ProvidesExplClass {booklist2021} {2021/06/07} {2021} {Book list class}
 \LoadClass{article}
 
 \RequirePackageWithOptions{geometry}
@@ -131,6 +131,19 @@
 		}
 		)
 	}
+	\prop_if_in:NnT #1 {dewey}
+		{
+			{~}
+			\prop_get:NnNT #1 {dewey} \l_tmpb_tl {
+				\textsc{
+					dds:
+					\prop_get:NnNT \g_booklist_config_prop {oldstylenums}
+						\l_tmpa_tl
+						{\tl_use:N \l_tmpa_tl}
+					{\tl_use:N \l_tmpb_tl}
+				}
+			}
+		}
 }
 
 \cs_new:Nn \booklist_format_author:N {
