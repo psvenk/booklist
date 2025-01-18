@@ -1,7 +1,7 @@
 %% Book list class - 2025 version
-% Last updated 2021-10-01
+% Last updated 2025-01-17
 
-% Copyright (c) 2020-21 psvenk
+% Copyright (c) 2020-25 psvenk
 
 % This Source Code Form is subject to the terms of the Mozilla Public
 % License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,7 +11,7 @@
 
 \NeedsTeXFormat{LaTeX2e}
 \RequirePackage{expl3, l3keys2e, xparse}
-\ProvidesExplClass {booklist2025} {2021/06/07} {2025} {Book list class}
+\ProvidesExplClass {booklist2025} {2025/01/17} {2025} {Book list class}
 \LoadClass{article}
 
 \RequirePackageWithOptions{geometry}
@@ -232,39 +232,63 @@
 		\DTMenglishshortmonthname{
 			\int_use:N \l_booklist_datea_month_int
 		}
-		, ~
-		\bool_if:NTF \l_booklist_dateb_unknown_bool
+
+		\bool_lazy_all:nF
 		{
-			\prop_get:NnNT \g_booklist_config_prop {unknowncolor}
-			\l_tmpa_tl {
-				\color{\tl_use:N \l_tmpa_tl}
+			{
+				\bool_not_p:n {\l_booklist_dateb_unknown_bool}
 			}
-			{???}
+			{
+				\int_compare_p:nNn
+				{\l_booklist_datea_year_int}
+				= {\l_booklist_dateb_year_int}
+			}
+			{
+				\int_compare_p:nNn
+				{\l_booklist_datea_month_int}
+				= {\l_booklist_dateb_month_int}
+			}
+			{
+				\int_compare_p:nNn
+				{\l_booklist_datea_day_int}
+				= {\l_booklist_dateb_day_int}
+			}
 		}
 		{
-			\bool_if:NT \l_booklist_dateb_approx_bool {
-				\textasciitilde{}
-			}
-			\DTMenglishordinal{\int_use:N \l_booklist_dateb_day_int}
-			\DTMenGBdaymonthsep
-			\DTMenglishshortmonthname{
-				\int_use:N \l_booklist_dateb_month_int
-			}
-
-			\int_compare:nNnF
-			{\l_booklist_dateb_year_int}
-			= {\g_booklist_currentyear_int}
+			, ~
+			\bool_if:NTF \l_booklist_dateb_unknown_bool
 			{
-				\DTMenGBmonthyearsep
-				\int_use:N \l_booklist_dateb_year_int
+				\prop_get:NnNT \g_booklist_config_prop {unknowncolor}
+				\l_tmpa_tl {
+					\color{\tl_use:N \l_tmpa_tl}
+				}
+				{???}
+			}
+			{
+				\bool_if:NT \l_booklist_dateb_approx_bool {
+					\textasciitilde{}
+				}
+				\DTMenglishordinal{\int_use:N \l_booklist_dateb_day_int}
+				\DTMenGBdaymonthsep
+				\DTMenglishshortmonthname{
+					\int_use:N \l_booklist_dateb_month_int
+				}
 
-				\int_compare:nNnT
+				\int_compare:nNnF
 				{\l_booklist_dateb_year_int}
-				> {\g_booklist_currentyear_int}
+				= {\g_booklist_currentyear_int}
 				{
-					\int_gset_eq:NN
-					\g_booklist_currentyear_int
-					\l_booklist_dateb_year_int
+					\DTMenGBmonthyearsep
+					\int_use:N \l_booklist_dateb_year_int
+
+					\int_compare:nNnT
+					{\l_booklist_dateb_year_int}
+					> {\g_booklist_currentyear_int}
+					{
+						\int_gset_eq:NN
+						\g_booklist_currentyear_int
+						\l_booklist_dateb_year_int
+					}
 				}
 			}
 		}
