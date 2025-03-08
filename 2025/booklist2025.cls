@@ -1,5 +1,5 @@
 %% Book list class - 2025 version
-% Last updated 2025-03-02
+% Last updated 2025-03-08
 
 % Copyright (c) 2020-25 psvenk
 
@@ -11,7 +11,7 @@
 
 \NeedsTeXFormat{LaTeX2e}
 \RequirePackage{expl3, l3keys2e, xparse}
-\ProvidesExplClass {booklist2025} {2025/03/02} {2025} {Book list class}
+\ProvidesExplClass {booklist2025} {2025/03/08} {2025} {Book list class}
 \LoadClass{article}
 
 \RequirePackageWithOptions{geometry}
@@ -257,8 +257,14 @@
 			\int_use:N \l_booklist_datea_month_int
 		}
 
-		\int_compare:nNnF
-		{\l_booklist_datea_year_int} = {\l_booklist_dateb_year_int}
+		\bool_lazy_or:nnT
+		{
+			! \int_compare_p:nNn
+			{\l_booklist_datea_year_int} = {\l_booklist_dateb_year_int}
+		}
+		{
+			\l_booklist_dateb_unknown_bool
+		}
 		{
 			\DTMenGBmonthyearsep
 			\int_use:N \l_booklist_datea_year_int
@@ -329,8 +335,11 @@
 		= {\g_booklist_currentyear_int}
 	}
 	{
-		\DTMenGBmonthyearsep
-		\int_use:N \l_booklist_dateb_year_int
+		\bool_if:NF \l_booklist_dateb_unknown_bool
+		{
+			\DTMenGBmonthyearsep
+			\int_use:N \l_booklist_dateb_year_int
+		}
 	}
 
 	\int_compare:nNnF
